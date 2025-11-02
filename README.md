@@ -1,132 +1,97 @@
-# Financy
-📚 Documentação do Projeto "Financy"
+# 💰 Financy: Gerenciamento Financeiro Pessoal
 
-O projeto Financy é um aplicativo de gerenciamento financeiro pessoal desenvolvido em Flutter. Ele utiliza o Hive como banco de dados NoSQL local para persistência de dados, garantindo que as informações do usuário (contas e transações) sejam armazenadas de forma segura e offline.
+Financy é um aplicativo móvel simples e eficiente desenvolvido em Flutter para gerenciamento financeiro pessoal. Ele oferece uma solução de controle de orçamento totalmente offline, utilizando o banco de dados local Hive para armazenamento seguro e persistente de dados.
 
-🚀 Funcionalidades Principais
+## 🌟 Funcionalidades
 
-O aplicativo foi desenvolvido para ser intuitivo e eficiente no controle de receitas e despesas:
+O aplicativo permite ao usuário manter um registro claro de suas finanças com as seguintes funcionalidades:
 
-Autenticação Local:
+| Funcionalidade | Descrição |
+|----------------|-----------|
+| Autenticação Segura | Cadastro e Login de usuários com senhas criptografadas (SHA-256) para garantir a segurança dos dados pessoais. |
+| Transações Recorrentes | Registro de Receitas e Despesas com definição de frequência (Diária, Semanal, Mensal). |
+| Dashboard Mensal | Visualização instantânea do saldo total, total de receitas e despesas projetadas para o mês. |
+| Análise Visual | Gráfico de Pizza (`fl_chart`) para exibir a distribuição percentual entre receitas e despesas. |
+| Gerenciamento de Dados | Permite adicionar, listar e remover transações facilmente. |
 
-Cadastro de novos usuários.
+## 🛠️ Tecnologias Utilizadas
 
-Login seguro com senha criptografada (SHA-256).
+* **Linguagem:** Dart
+* **Framework:** Flutter
+* **Banco de Dados Local:** Hive (e `hive_flutter`) - Um banco de dados NoSQL rápido e leve.
+* **Gráficos:** fl_chart - Para a visualização do Gráfico de Pizza.
+* **Criptografia:** crypto - Utilizado para hashing (SHA-256) de senhas.
 
-Verificação do estado de login na inicialização (main.dart).
+## 📂 Estrutura do Projeto
 
-Gerenciamento de Transações:
+O projeto segue uma arquitetura baseada em camadas (Apresentação e Serviço) para manter a separação de responsabilidades:
 
-Adição de transações (Receita ou Despesa) com nome, valor e frequência (diária, semanal, mensal).
+| Arquivo | Camada | Responsabilidade |
+|---------|--------|------------------|
+| `main.dart` | Inicialização | Inicializa o Hive e define o roteamento, verificando o status de login. |
+| `storage_service.dart` | Serviço/Dados (Repository) | Gerencia a persistência de dados (CRUD de Transações) e a lógica de Autenticação (Login, Cadastro). |
+| `models.dart` | Modelos | Definição dos modelos de dados (`Usuario`, `TransacaoModel`) e o enum `Frequencia`. |
+| `models.g.dart` | Gerado | Adaptadores de tipo do Hive. |
+| `login_screen.dart` | Apresentação | Interface para a tela de Login. |
+| `cadastro_screen.dart` | Apresentação | Interface para a tela de Cadastro de novos usuários. |
+| `home_screen.dart` | Apresentação/Lógica | Dashboard principal, cálculos financeiros (`_calcularTotais`), e listagem de transações. |
 
-Listagem de todas as transações do usuário logado.
+## 💡 Detalhes de Implementação
 
-Remoção de transações via botão ou gesto de swipe na lista.
+### Segurança (Autenticação)
 
-Resumo Financeiro Mensal:
+As senhas dos usuários não são armazenadas em texto simples. O `StorageService` utiliza:
 
-Cálculo do saldo total, total de receitas e total de despesas, projetando as transações diárias/semanais para um valor mensal.
+1. O pacote `crypto` para gerar um hash irreversível da senha com o algoritmo SHA-256 (`_hashSenha`).
+2. O `Usuario` é salvo no Hive com este hash.
+3. No login, a senha inserida é novamente hasheada e comparada com o hash armazenado.
 
-Visualização da distribuição de receitas vs. despesas através de um Gráfico de Pizza (fl_chart).
+### Lógica de Projeção Mensal
 
-🛠️ Estrutura do Código
+No `home_screen.dart`, a função `_calcularTotais` garante que o dashboard exiba um resumo mensal preciso, mesmo para transações recorrentes.
 
-Arquivo
+| Frequência (`Frequencia` Enum) | Multiplicador | Racional |
+|--------------------------------|---------------|----------|
+| `mensal` | `1` | Valor é somado diretamente. |
+| `semanal` | `4` | Projeção de 4 semanas por mês. |
+| `diaria` | `30` | Projeção de 30 dias por mês. |
 
-Descrição
+O Saldo Total é calculado como: `Total de Receitas Mensais - Total de Despesas Mensais`.
 
-Componentes/Classes Chave
+## ⚙️ Como Instalar
 
-main.dart
+Para rodar o projeto Financy localmente, siga os passos abaixo:
 
-Ponto de entrada do aplicativo. Inicializa o Hive e define o roteamento, direcionando para a tela correta com base no status de login.
+### Pré-requisitos
 
-main(), FinanceApp
+* Flutter SDK instalado.
+* Um IDE configurado para Flutter (VS Code ou Android Studio).
 
-storage_service.dart
+### Passos
 
-Camada de Serviço (Repository) para todas as operações de banco de dados (Hive). Contém a lógica de autenticação e manipulação de transações.
+1. **Clone o repositório:**
 
-StorageService, init(), cadastrarUsuario(), login(), _hashSenha()
+```bash
+git clone https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories
+cd financy
+```
 
-models.dart
+2. **Instale as dependências:**
 
-Definição dos modelos de dados utilizados no Hive.
+```bash
+flutter pub get
+```
 
-Usuario, TransacaoModel, Frequencia (enum)
+3. **Gere os adaptadores do Hive:** Como o projeto usa o Hive e os arquivos `models.g.dart` são gerados, você pode precisar rodar o build runner se houver modificações nos modelos:
 
-models.g.dart
+```bash
+flutter pub run build_runner build
+```
 
-Arquivo gerado automaticamente pelo hive_generator que contém os adaptadores de tipo necessários para o Hive persistir os modelos.
+4. **Execute o aplicativo:**
 
-UsuarioAdapter, TransacaoModelAdapter
+```bash
+flutter run
+```
 
-login_screen.dart
-
-Tela de interface para o usuário acessar a conta.
-
-LoginScreen
-
-cadastro_screen.dart
-
-Tela de interface para o registro de um novo usuário.
-
-CadastroScreen
-
-home_screen.dart
-
-Tela principal (Dashboard) do aplicativo. Contém a lógica de cálculo financeiro, o gráfico e a lista de transações.
-
-HomeScreen, _buildPieChartCard(), _calcularTotais()
-
-🔒 Detalhes de Implementação
-
-1. Persistência e Segurança (storage_service.dart)
-
-O aplicativo utiliza o pacote hive_flutter para armazenamento local.
-
-Autenticação: A segurança é garantida pela criptografia da senha.
-
-Algoritmo: Utiliza SHA-256 do pacote crypto para transformar a senha bruta em um hash irreversível (_hashSenha(String senha)).
-
-O login é validado comparando o hash da senha inserida com o hash armazenado no Usuario.
-
-Controle de Sessão: O e-mail do usuário logado é armazenado na box current_user do Hive para manter o estado da sessão entre as execuções do app.
-
-Isolamento de Dados: Todas as transações são salvas com um campo userId (o e-mail do usuário). O método getTransacoesDoUsuario() filtra as transações, garantindo que cada usuário veja apenas seus próprios dados.
-
-2. Lógica de Cálculo Mensal (home_screen.dart)
-
-Para criar um resumo financeiro útil, o HomeScreen projeta as transações recorrentes para um valor mensal:
-
-A função de cálculo (_calcularTotais) itera sobre todas as transações, aplicando os seguintes fatores de multiplicação baseados no enum Frequencia (0=diaria, 1=semanal, 2=mensal):
-
-Frequência
-
-Fator de Multiplicação
-
-Racional
-
-Mensal (2)
-
-1
-
-O valor é somado diretamente.
-
-Semanal (1)
-
-4
-
-Projeção de 4 semanas por mês.
-
-Diária (0)
-
-30
-
-Projeção de 30 dias por mês.
-
-O saldoTotal é calculado como totalReceitasMensais - totalDespesasMensais.
-
-3. Gerenciamento de Estado e Reatividade
-
-O Hive, por ser um banco de dados reativo, permite que os widgets sejam atualizados automaticamente. No entanto, o HomeScreen utiliza setState após cada operação de CRUD (_adicionarTransacao, _removerTransacao) e no _carregarTransacoes (chamado em initState) para recarregar a lista e os cálculos do dashboard.
+O aplicativo será iniciado no dispositivo ou emulador conectado.
