@@ -72,7 +72,7 @@ Para rodar o projeto Financy localmente, siga os passos abaixo:
 1. **Clone o repositório:**
 
 ```bash
-git clone https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories
+git clone [https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories](https://github.com/rafasdsm/Financy.git)
 cd financy
 ```
 
